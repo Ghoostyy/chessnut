@@ -1,6 +1,6 @@
 use crate::piece::{Couleur, Piece, TypePiece};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Echiquier {
     pub plateau: [[Option<Piece>; 8]; 8],
 }

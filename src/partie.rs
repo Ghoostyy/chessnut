@@ -101,6 +101,20 @@ impl Partie {
                     }
                 }
 
+                if let Some(piece) = self.echiquier.plateau[y1][x1] {
+                    if piece.type_piece == TypePiece::Roi && (x2 as isize - x1 as isize).abs() == 2
+                    {
+                        let direction = if x2 > x1 { 1 } else { -1 };
+                        let tour_x = if direction == 1 { 7 } else { 0 };
+                        let nouvelle_position_tour_x = (x2 as isize - direction) as usize;
+
+                        // Déplacer la tour
+                        self.echiquier.plateau[y1][nouvelle_position_tour_x] =
+                            self.echiquier.plateau[y1][tour_x];
+                        self.echiquier.plateau[y1][tour_x] = None;
+                    }
+                }
+
                 // Sauvegarder le dernier coup
                 let piece_capturee = self.echiquier.plateau[y2][x2];
                 self.dernier_coup = Some(((x1, y1), (x2, y2)));
@@ -296,8 +310,63 @@ impl Partie {
         self.deplacement_tour(x1, y1, x2, y2) || self.deplacement_fou(x1, y1, x2, y2)
     }
 
+    fn est_en_echec_apres_deplacement(&self, x1: usize, y1: usize, x2: usize, y2: usize) -> bool {
+        let mut echiquier_simule = self.echiquier.clone();
+        let piece = echiquier_simule.plateau[y1][x1];
+        echiquier_simule.plateau[y2][x2] = piece;
+        echiquier_simule.plateau[y1][x1] = None;
+
+        let couleur = piece.unwrap().couleur;
+        Partie {
+            echiquier: echiquier_simule,
+            joueur_noir: self.joueur_noir,
+            historique_coups: self.historique_coups.clone(),
+            dernier_coup: self.dernier_coup,
+        }
+        .est_en_echec(couleur)
+    }
+
     fn deplacement_roi(&self, x1: usize, y1: usize, x2: usize, y2: usize) -> bool {
-        // Le Roi se déplace d'une case dans n'importe quelle direction
-        (x2 as isize - x1 as isize).abs() <= 1 && (y2 as isize - y1 as isize).abs() <= 1
+        // Mouvement normal du roi : d'une case dans n'importe quelle direction
+        if (x2 as isize - x1 as isize).abs() <= 1 && (y2 as isize - y1 as isize).abs() <= 1 {
+            return true;
+        }
+
+        // Vérification du roque
+        if y1 == y2 && (x2 as isize - x1 as isize).abs() == 2 {
+            let direction = if x2 > x1 { 1 } else { -1 }; // 1 pour petit roque, -1 pour grand roque
+            let tour_x = if direction == 1 { 7 } else { 0 }; // Position initiale de la tour
+            let milieu_x1 = (x1 as isize + direction) as usize;
+            let milieu_x2 = (x1 as isize + 2 * direction) as usize;
+
+            // Vérifier si la tour est à la bonne position
+            if let Some(tour) = self.echiquier.plateau[y1][tour_x] {
+                if tour.type_piece == TypePiece::Tour
+                    && tour.couleur == self.echiquier.plateau[y1][x1].unwrap().couleur
+                {
+                    // Vérifier que les cases entre le roi et la tour sont vides
+                    let (start, end) = if direction == 1 {
+                        (x1 + 1, tour_x)
+                    } else {
+                        (tour_x + 1, x1)
+                    };
+                    for i in start..end {
+                        if self.echiquier.plateau[y1][i].is_some() {
+                            return false; // Une pièce bloque le chemin
+                        }
+                    }
+
+                    // Vérifier que le roi ne passe pas par une case attaquée
+                    if !self.est_en_echec(self.echiquier.plateau[y1][x1].unwrap().couleur)
+                        && !self.est_en_echec_apres_deplacement(x1, y1, milieu_x1, y1)
+                        && !self.est_en_echec_apres_deplacement(x1, y1, milieu_x2, y1)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        false
     }
 }

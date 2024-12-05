@@ -41,6 +41,12 @@ impl eframe::App for ChessGame {
                     // Utilisation de std::process::exit(0) pour quitter l'application
                     process::exit(0); // Cela ferme immédiatement l'application
                 }
+                if ui.button("Rejouer").clicked() {
+                    // Appeler la méthode pour réinitialiser la partie
+                    self.partie = Partie::nouvelle();
+                    self.message = "Nouvelle partie commencée!".to_string();
+                    self.game_status.clear(); // Réinitialiser le statut du jeu
+                }
             });
         });
 
