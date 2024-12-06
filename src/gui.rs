@@ -22,10 +22,11 @@ impl ChessGame {
 
 impl eframe::App for ChessGame {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+        let _ = frame;
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             ui.horizontal(|ui| {
                 ui.label("Joueur actuel :");
-                if self.partie.joueur_noir {
+                if !self.partie.joueur_noir {
                     ui.colored_label(egui::Color32::BLACK, "Noir");
                 } else {
                     ui.colored_label(egui::Color32::WHITE, "Blanc");
@@ -41,7 +42,7 @@ impl eframe::App for ChessGame {
                     // Utilisation de std::process::exit(0) pour quitter l'application
                     process::exit(0); // Cela ferme immédiatement l'application
                 }
-                if ui.button("Rejouer").clicked() {
+                if ui.button("Nouvelle Partie").clicked() {
                     // Appeler la méthode pour réinitialiser la partie
                     self.partie = Partie::nouvelle();
                     self.message = "Nouvelle partie commencée!".to_string();

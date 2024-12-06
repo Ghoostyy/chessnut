@@ -29,11 +29,6 @@ impl Piece {
         }
     }
 
-    // Méthode pour obtenir la couleur de la pièce
-    pub fn couleur(&self) -> Couleur {
-        self.couleur
-    }
-
     // Méthode pour obtenir le caractère représentant la pièce
     pub fn caractere(&self) -> char {
         match (self.type_piece, self.couleur) {

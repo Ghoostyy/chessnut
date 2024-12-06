@@ -2,9 +2,6 @@ mod echiquier;
 mod gui;
 mod partie;
 mod piece;
-mod utils;
-
-use eframe::egui;
 
 fn main() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions::default();

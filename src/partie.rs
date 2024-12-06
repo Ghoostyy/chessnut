@@ -50,28 +50,6 @@ impl Partie {
         panic!("Roi non trouvé sur le plateau"); // Cela ne devrait jamais arriver si le plateau est correctement initialisé
     }
 
-    pub fn est_echec_et_mat(&self, couleur: Couleur) -> bool {
-        if !self.est_en_echec(couleur) {
-            return false;
-        }
-
-        // Vérifier si le roi peut se déplacer ou s'il peut être protégé
-        for x in 0..8 {
-            for y in 0..8 {
-                if let Some(piece) = self.echiquier.plateau[y][x] {
-                    if piece.couleur == couleur {
-                        if self.deplacement_valide(x, y, x, y) {
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Si aucune des pièces ne peut protéger ou déplacer le roi, c'est un échec et mat
-        true
-    }
-
     pub fn deplacement(&mut self, x1: usize, y1: usize, x2: usize, y2: usize) -> bool {
         println!(
             "Tentative de déplacement de ({}, {}) vers ({}, {})",

@@ -39,16 +39,4 @@ impl Echiquier {
 
         Echiquier { plateau }
     }
-
-    pub fn afficher(&self) {
-        for ligne in &self.plateau {
-            for case in ligne {
-                match case {
-                    Some(piece) => print!("{} ", piece.caractere()),
-                    None => print!(". "),
-                }
-            }
-            println!();
-        }
-    }
 }
